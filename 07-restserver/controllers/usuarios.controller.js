@@ -8,7 +8,7 @@ const usuariosGet = async (req = request, res = response) => {
     //Para tomar los queryparams
     const { limite = 5, desde = 0 } = req.query;
 
-    const [total,usuarios] = await Promise.all([
+    const [usuarios,total] = await Promise.all([
         Usuario.find({estado: true}).limit(Number(limite)).skip(Number(desde)),
         Usuario.countDocuments({estado: true})]);
 
@@ -43,7 +43,7 @@ const usuariosPut = async (req = request, res = response) => {
         resto.contraseña = bcryptjs.hashSync(contraseña,salt);
     }
 
-    const usuario = await Usuario.findByIdAndUpdate(id,resto);
+    const usuario = await Usuario.findByIdAndUpdate(id,resto,{new:true});
 
     res.json({
         usuario
@@ -56,7 +56,7 @@ const usuariosDelete = async (req = request, res = response) => {
     //const usuario = await Usuario.findByIdAndDelete(id);
 
     //Borrado lógico
-    const usuario = await Usuario.findByIdAndUpdate(id,{estado:false});
+    const usuario = await Usuario.findByIdAndUpdate(id,{estado:false},{new:true});
     const usuarioAutenticado = req.usuarioAutenticado;
     res.json(usuario);
 };

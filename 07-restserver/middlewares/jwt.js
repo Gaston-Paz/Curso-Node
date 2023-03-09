@@ -13,10 +13,8 @@ const validarJWT = async (req = request, res = response, next) => {
     }
 
     try {
-        
-        const { uid } = jwt.verify(token,process.env.SECRETORPRIVATEKEY);
-
-        const usuarioAutenticado = await Usuario.findById(uid);
+        const { id }  = jwt.verify(token,process.env.SECRETORPRIVATEKEY);
+        const usuarioAutenticado = await Usuario.findById(id);
 
         if(!usuarioAutenticado){
             return res.status(401).json({
