@@ -52,13 +52,12 @@ const usuariosPut = async (req = request, res = response) => {
 
 const usuariosDelete = async (req = request, res = response) => {
     const { id } = req.params;
-
     //Borrado físico
     //const usuario = await Usuario.findByIdAndDelete(id);
 
     //Borrado lógico
     const usuario = await Usuario.findByIdAndUpdate(id,{estado:false});
-
+    const usuarioAutenticado = req.usuarioAutenticado;
     res.json(usuario);
 };
 

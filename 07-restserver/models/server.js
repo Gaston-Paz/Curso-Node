@@ -8,6 +8,7 @@ class Server{
         this.app = express();
         this.port = process.env.PORT;
         this.usuariosRoute = '/api/usuarios';
+        this.authRoute = '/api/auth';
 
         //Conectar a DB Mongo
         this.conectarDB();
@@ -24,6 +25,7 @@ class Server{
     }
 
     routes(){
+        this.app.use(this.authRoute, require('../routes/auth.routes'));
         this.app.use(this.usuariosRoute, require('../routes/usuarios.routes'));
     }
 
