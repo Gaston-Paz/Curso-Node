@@ -3,12 +3,16 @@ const bcryptjs = require('bcryptjs');
 const Usuario = require('../models/usuario');
 
 
-const usuariosGet = (req = request, res = response) => {
+const usuariosGet = async (req = request, res = response) => {
 
     //Para tomar los queryparams
-    // const { nombre } = req.query;
+    const { limite = 5, desde = 0 } = req.query;
 
-    res.json();
+    const [total,usuarios] = await Promise.all([
+        Usuario.find({estado: true}).limit(Number(limite)).skip(Number(desde)),
+        Usuario.countDocuments({estado: true})]);
+
+    res.json({total,usuarios});
 };
 
 const usuariosPost = async (req = request, res = response) => {
@@ -30,14 +34,32 @@ const usuariosPost = async (req = request, res = response) => {
     });
 };
 
-const usuariosPut = (req = request, res = response) => {
+const usuariosPut = async (req = request, res = response) => {
     const { id } = req.params;
-    res.json(id);
+    const { _id, contraseña, google, correo, ...resto } = req.body;
+
+    if(contraseña){
+        const salt = bcryptjs.genSaltSync();
+        resto.contraseña = bcryptjs.hashSync(contraseña,salt);
+    }
+
+    const usuario = await Usuario.findByIdAndUpdate(id,resto);
+
+    res.json({
+        usuario
+    });
 };
 
-const usuariosDelete = (req = request, res = response) => {
+const usuariosDelete = async (req = request, res = response) => {
     const { id } = req.params;
-    res.json(id);
+
+    //Borrado físico
+    //const usuario = await Usuario.findByIdAndDelete(id);
+
+    //Borrado lógico
+    const usuario = await Usuario.findByIdAndUpdate(id,{estado:false});
+
+    res.json(usuario);
 };
 
 module.exports = {

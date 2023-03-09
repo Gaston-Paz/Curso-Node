@@ -6,14 +6,19 @@ const { usuariosGet,
 const { check } = require('express-validator');
 
 const { validarCampos } = require('../middlewares/validar-campos');
-const { validarRol, existeCorreo } = require('../helpers/db-validators');
+const { validarRol, existeCorreo, existeUsuarioporId } = require('../helpers/db-validators');
 
 
 const router = Router();
 
 router.get('/', usuariosGet);
 
-router.put('/:id', usuariosPut);
+router.put('/:id', [
+       check('id','No es un ID válido').isMongoId(),
+       check('id').custom(existeUsuarioporId),
+       check('rol').custom( validarRol ),
+       validarCampos
+] ,usuariosPut);
 
 router.post('/', [
         check('correo','El formato del correo es inválido').isEmail(),
@@ -27,6 +32,10 @@ router.post('/', [
         validarCampos
 ] ,usuariosPost);
 
-router.delete('/:id', usuariosDelete);
+router.delete('/:id', [
+        check('id','No es un ID válido').isMongoId(),
+        check('id').custom(existeUsuarioporId),
+        validarCampos
+ ], usuariosDelete);
 
 module.exports = router;
