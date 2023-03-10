@@ -1,45 +1,47 @@
 const { Router } = require('express');
 const { check } = require('express-validator');
-const { crearCategoria, obtenerCategorias, obtenerCategoria, actualizarCategoria, borrarCategoria } = require('../controllers/categorias.controller');
+const { obtenerProductos, obtenerProducto, crearProducto, actualizarProducto, borrarProducto } = require('../controllers/productos.controller');
 const { validarCampos, validarJWT, esAdmin } = require('../middlewares/index');
-const { existeCategoria } = require('../helpers/db-validators');
+const { existeProducto } = require('../helpers/db-validators');
 
 const router = Router();
 
-router.get('/', obtenerCategorias);
+router.get('/', obtenerProductos);
 
 router.get('/:id', [
     check('id','El id es obligatorio').notEmpty(),
     check('id','No es un ID válido').isMongoId(),
-    check('id').custom(existeCategoria),
+    check('id').custom(existeProducto),
     validarCampos
 ],
-obtenerCategoria);
+obtenerProducto);
 
 router.post('/', [
     validarJWT,
     check('nombre','El nombre es obligatorio').notEmpty(),
+    check('categoria','La categoría es obligatoria').notEmpty(),
     validarCampos
 ],
-crearCategoria
+crearProducto
 );
 
 router.put('/:id', [
     validarJWT,
     check('id','El id es obligatorio').notEmpty(),
     check('id','No es un ID válido').isMongoId(),
-    check('id').custom(existeCategoria),
+    check('id').custom(existeProducto),
     check('nombre','El nombre es obligatorio').notEmpty(),
+    check('categoria','La categoría es obligatoria').notEmpty(),
     validarCampos
-], actualizarCategoria);
+], actualizarProducto);
 
 router.delete('/:id', [
     validarJWT,
     check('id','El id es obligatorio').notEmpty(),
     check('id','No es un ID válido').isMongoId(),
-    check('id').custom(existeCategoria),
+    check('id').custom(existeProducto),
     esAdmin,
     validarCampos
-], borrarCategoria);
+], borrarProducto);
 
 module.exports = router;
